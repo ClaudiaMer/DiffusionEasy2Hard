@@ -49,6 +49,7 @@ def run_experiment(load_data, model_save_folder):
     parser.add_argument("--seed", default=1, type=int)
     parser.add_argument("--lr", default=1e-3, type=float)
     parser.add_argument("--batch_size", default=100, type=int)
+    parser.add_argument("--dim_1d", default=80, type=int)
     
     # cosine learning rate scheduling
     parser.add_argument("--cosine_lr", help="use cosine annealing learning rate scheduling",

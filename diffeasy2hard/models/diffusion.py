@@ -1,8 +1,8 @@
 import torch
 from tqdm import tqdm
 from .betas import linear, linear_scaled
-from lineardiffusion.models.tracker import Tracker, track_loss
-from lineardiffusion.models.networks import AffineLinear
+from diffeasy2hard.models.tracker import Tracker, track_loss
+
 import numpy as np
 
 
@@ -128,8 +128,6 @@ class Diffusion:
         return self.multiply_with_time_factor(1.0/torch.sqrt(self.alpha[t]),
                                                x_t + term_2)
 
-
-    
     def sample(self, num_samples, t_min=0,
                latents=None, shape=None, style="Ho", sample_batch=False):
         """generate samples
@@ -242,11 +240,6 @@ class Diffusion:
 
         _loss = self.loss_func(epsilon_theta, noise)
         
-        if type(self.model) == AffineLinear: 
-            reg = torch.einsum("t, tij ->",
-                               self.gamma[ts]/(self.dim*len(ts)), # divide to have same prefactor as MSEloss
-                               self.model.weights(ts)**2)
-            _loss += reg
         return _loss
     
     def train(self, dataloader, n_epochs=10, lr=1e-3,
@@ -310,6 +303,29 @@ class Diffusion:
                         break
         
         self.tracker.track(self, self.steps, batch, loss=_loss)
+
+    def eval_loss_dataset(self, data_loader, loss_func=None):
+        """Evaluate loss on data set provided through data loader
+
+        Args:
+            data_loader (torch.utils.data.DataLoader): iterator for data set on which to evaluate loss
+            loss_func (function, optional): Specific loss function to use. Defaults to None. If None, will use self.loss.
+
+        Returns:
+            torch.tensor: average loss on data set
+        """
+        
+        if loss_func is None: 
+            loss_func = self.loss
+        self.model.eval()
+        losses = []
+        with torch.no_grad():
+            for x in data_loader:  
+                x = x[0].to(self.device)
+                losses += [loss_func(x)]
+        
+        self.model.train()
+        return torch.mean(torch.Tensor(losses))
 
     def remove_regularization(self,): 
         self.gamma = torch.zeros_like(self.beta).to(self.device)

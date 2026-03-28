@@ -74,7 +74,9 @@ def get_steps_paths(folder, interval, weight_decay, c):
 
 
 
-def eval_checkpoints(data_folder, model_folder, save_folder, interval, weight_decay, c, t="all", dim1d=32): 
+def eval_checkpoints(data_folder, model_folder,
+                     save_folder, interval, weight_decay,
+                     c, t="all", dim1d=32): 
     """Evaluate loss of clone datasets on checkpoints.
 
     Args:

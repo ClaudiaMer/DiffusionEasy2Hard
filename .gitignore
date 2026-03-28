@@ -1,0 +1,7 @@
+*.sh
+*.err
+*.log
+*.out
+*.pt
+__pycache__*
+*.pyc

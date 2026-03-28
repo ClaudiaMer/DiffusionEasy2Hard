@@ -50,6 +50,8 @@ def make_noised(d, npoints, npoints_z_over_a=1, t=0.3, device=None,
     return x.T, z.T
 
 
+
+
 def make_noised_mean(d, npoints, npoints_z_over_a=1, t=0.3, device=None):
     """Generate noised samples with adjusted mean and variance."""
     a = torch.randn(d, npoints, device=device)
