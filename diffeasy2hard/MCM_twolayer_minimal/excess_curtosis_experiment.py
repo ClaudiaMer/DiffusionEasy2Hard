@@ -64,6 +64,8 @@ def main(args):
         f"  bs         = {args.bs}\n"
         f"  t          = {args.t_val}\n"
         f"  adam       = {args.adam}\n"
+        f"  add_cov_spike = {args.add_cov_spike}\n"
+        f"  correlated_latents = {args.correlated_latents}\n"
     )
 
     results = learning_experiment(
@@ -80,7 +82,9 @@ def main(args):
         t=args.t_val,
         save=True,
         N=args.N, 
-        skip=args.skip
+        skip=args.skip, 
+        add_cov_spike = args.add_cov_spike, 
+        correlated_latents = args.correlated_latents
     )
 
     # Explicit cleanup (important on clusters)
@@ -108,8 +112,11 @@ if __name__ == "__main__":
     parser.add_argument("--adam", action="store_true")
     parser.add_argument("--sample-fn", type=str, default="sign",
                         choices=SAMPLE_FNS.keys())
+    
     parser.add_argument("--N", type=int, default=2)
     parser.add_argument("--skip", type=float, default=0)
+    parser.add_argument("--add-cov-spike", action="store_true")
+    parser.add_argument("--correlated-latents", action="store_true")
 
     args = parser.parse_args()
     main(args)

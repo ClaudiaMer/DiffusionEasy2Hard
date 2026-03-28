@@ -5,7 +5,7 @@ import numpy.random as rnd
 from joblib import Parallel, delayed
 from scipy.stats import t
 
-VAR = 1.0
+VAR_cov_spike = 10.0
 VAR1 = 1.0
 
 # ----------------------
@@ -36,12 +36,18 @@ def make_x(a, z, t=0.3):
     return x
 
 def make_noised(d, npoints, npoints_z_over_a=1, t=0.3, device=None,
-                sample_first_dim=np.sign):
+                sample_first_dim=np.sign, add_cov_spike=False, correlated_latents=False):
     """Generate noised samples a, z using PyTorch."""
     a = torch.randn(d, npoints, device=device)
-    a[0, :] = sample_first_dim(a[0, :])*np.sqrt(VAR1)
-    a[1, :] *= torch.sqrt(torch.tensor(VAR, device=device))
+    
+    if add_cov_spike:
+        a[1, :] *= torch.sqrt(torch.tensor(VAR_cov_spike, device=device))
+    if correlated_latents:  
+        a[0, :] = sample_first_dim(a[1, :])*np.sqrt(VAR1)
+    else:
+        a[0,:] *= sample_first_dim(a[0, :])*np.sqrt(VAR1)
     a[2, :] += 1.0
+
     a = a.repeat(1, npoints_z_over_a)
     assert a.shape == (d, npoints * npoints_z_over_a)
 
@@ -52,10 +58,13 @@ def make_noised(d, npoints, npoints_z_over_a=1, t=0.3, device=None,
 
 
 
-def make_noised_mean(d, npoints, npoints_z_over_a=1, t=0.3, device=None):
+def make_noised_mean(d, npoints, npoints_z_over_a=1, t=0.3, device=None, add_cov_spike=False):
     """Generate noised samples with adjusted mean and variance."""
     a = torch.randn(d, npoints, device=device)
-    average_variance = (VAR + VAR1 + d - 2) / d
+    if add_cov_spike:
+        average_variance = (VAR_cov_spike + VAR1 + d - 2) / d
+    else: 
+        average_variance = (VAR1 + d - 1) / d
     a *= torch.sqrt(torch.tensor(average_variance, device=device))
     a[2, :] += 1.0
     a = a.repeat(1, npoints_z_over_a)
@@ -66,11 +75,12 @@ def make_noised_mean(d, npoints, npoints_z_over_a=1, t=0.3, device=None):
     return x.T, z.T
 
 
-def make_noised_mean_cov(d, npoints, npoints_z_over_a=1, t=0.3, device=None):
+def make_noised_mean_cov(d, npoints, npoints_z_over_a=1, t=0.3, device=None, add_cov_spike=False):
     """Generate noised samples with mean and covariance adjustments."""
     a = torch.randn(d, npoints, device=device)
     a[0,:] *= np.sqrt(VAR1)
-    a[1, :] *= torch.sqrt(torch.tensor(VAR, device=device))
+    if add_cov_spike:
+        a[1, :] *= torch.sqrt(torch.tensor(VAR_cov_spike, device=device))
     a[2, :] += 1.0
     a = a.repeat(1, npoints_z_over_a)
     assert a.shape == (d, npoints * npoints_z_over_a)

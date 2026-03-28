@@ -130,7 +130,8 @@ def load_experiment_by_args(directory="experiments/", prefix="exp", **kwargs):
 def learning_experiment(
     nits, d, m, ninits, t=0.3, bs=1, npoints_z_over_a=1,
     eta=0.01, norm=False, eps=1e-8, wnorm=1, act=F.tanh,
-    sample_first_dim=np.sign, Adam=False, save=True, N=2, skip=0
+    sample_first_dim=np.sign, Adam=False, save=True, N=2, skip=0, 
+    add_cov_spike=False, correlated_latents=False
 ):
     """Runs the learning experiment with the specified hyperparameters and returns the results."""
     #import numpy as np
@@ -139,9 +140,11 @@ def learning_experiment(
     # Create log-spaced steps
     log_steps = get_log_steps(nits)
 
-    a_test, z_test = make_noised(d, NUM_TEST, sample_first_dim=sample_first_dim)
-    a_test_mean, z_test_mean = make_noised_mean(d, NUM_TEST)
-    a_test_mean_cov, z_test_mean_cov = make_noised_mean_cov(d, NUM_TEST)
+    a_test, z_test = make_noised(d, NUM_TEST, sample_first_dim=sample_first_dim, 
+                                 add_cov_spike=add_cov_spike,
+                                 correlated_latents=correlated_latents)
+    a_test_mean, z_test_mean = make_noised_mean(d, NUM_TEST, add_cov_spike=add_cov_spike)
+    a_test_mean_cov, z_test_mean_cov = make_noised_mean_cov(d, NUM_TEST, add_cov_spike=add_cov_spike)
 
 
     def run_single_experiment(d, m, no, eta, nits, norm, wnorm,
@@ -238,7 +241,9 @@ def learning_experiment(
                             if callable(sample_first_dim) else str(sample_first_dim),
             Adam=Adam, 
             N=N, 
-            skip=skip
+            skip=skip, 
+            add_cov_spike=add_cov_spike,
+            correlated_latents=correlated_latents
         )
 
         save_experiment_results(
