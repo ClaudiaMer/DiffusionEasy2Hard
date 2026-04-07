@@ -115,8 +115,8 @@ if __name__ == "__main__":
     
     parser.add_argument("--N", type=int, default=2)
     parser.add_argument("--skip", type=float, default=0)
-    parser.add_argument("--add-cov-spike", action="store_true")
-    parser.add_argument("--correlated-latents", action="store_true")
+    parser.add_argument("--add_cov_spike", action="store_true")
+    parser.add_argument("--correlated_latents", action="store_true")
 
     args = parser.parse_args()
     main(args)

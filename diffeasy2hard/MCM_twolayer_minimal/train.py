@@ -267,9 +267,8 @@ def make_fig(results_all, steps, ninits, name, act, m):
 
     axs=axs.flatten()
     for i in range(ninits):
-        axs[0].plot(steps, results_all[i]["w0"], color="k",)
+        axs[0].plot(steps, np.array(results_all[i]["w0"])/np.array(results_all[i]["wnorm"]), color="k",)
         axs[1].plot(steps, results_all[i]["scale"], color="k")
-        #axs[2].plot(steps, np.array(results_all[i]["w0"])/np.array(results_all[i]["wnorm"]), color="k",)
         axs[2].plot(steps, results_all[i]["loss"], color="k", label="test loss")
         axs[2].plot(steps, results_all[i]["loss_mean"], color="r", label="loss_mean")
         axs[2].plot(steps, results_all[i]["loss_mean_cov"], color="g", label="loss_mean_cov")

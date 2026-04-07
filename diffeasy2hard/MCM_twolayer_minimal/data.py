@@ -45,7 +45,7 @@ def make_noised(d, npoints, npoints_z_over_a=1, t=0.3, device=None,
     if correlated_latents:  
         a[0, :] = sample_first_dim(a[1, :])*np.sqrt(VAR1)
     else:
-        a[0,:] *= sample_first_dim(a[0, :])*np.sqrt(VAR1)
+        a[0,:] = sample_first_dim(a[0, :])*np.sqrt(VAR1)
     a[2, :] += 1.0
 
     a = a.repeat(1, npoints_z_over_a)
