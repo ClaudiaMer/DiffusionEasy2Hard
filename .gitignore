@@ -3,5 +3,7 @@
 *.log
 *.out
 *.pt
-__pycache__*
+*/__pycache__/*
 *.pyc
+*.pdf
+*.pkl
